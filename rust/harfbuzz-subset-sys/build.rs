@@ -18,6 +18,11 @@ fn main() {
         // pthread mutexes rather than std::mutex, as meson configures it.
         build.define("HAVE_PTHREAD", "1");
     }
+    if std::env::var("CARGO_CFG_TARGET_ENV").is_ok_and(|env| env == "msvc") {
+        // The amalgamation has more sections than an MSVC object holds by default (C1128); meson.build adds the
+        // same flag.
+        build.flag("/bigobj");
+    }
     build.compile("harfbuzz-subset");
     println!("cargo:rerun-if-changed=../../src");
     println!("cargo:rerun-if-changed=build.rs");
